@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"poker-api/poker"
 
@@ -17,6 +18,9 @@ type HandResponse struct {
 }
 
 func main() {
+
+	poker.InitDB()
+
 	e := echo.New()
 
 	e.POST("/evaluate", func(c echo.Context) error {
@@ -26,6 +30,12 @@ func main() {
 		}
 
 		results, errors := poker.EvaluateHands(req.Hands)
+
+		// データベースに結果を保存
+		if err := poker.SaveResultsToDB(results, errors); err != nil {
+			log.Printf("Failed to save results to DB: %v", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to save results to database"})
+		}
 
 		return c.JSON(http.StatusOK, HandResponse{
 			Results: results,

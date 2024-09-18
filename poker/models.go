@@ -9,7 +9,7 @@ type HandResult struct {
 
 type InternalResult struct {
 	HandResult
-	Rank int `json:"rank"`
+	Rank int
 }
 
 type HandError struct {
